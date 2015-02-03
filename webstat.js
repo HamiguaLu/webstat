@@ -32,6 +32,7 @@ function GetDomain(url) {
 }
 
 function GetHostName(domain){
+	//replace country code like cn/uk etc
 	for (var i = 0; i < coutryDomain.length; ++i){
 		if (domain.lastIndexOf(coutryDomain[i])  == domain.length - coutryDomain[i].length){
 			domain = domain.replace(coutryDomain[i],"");
@@ -39,6 +40,7 @@ function GetHostName(domain){
 		}
 	}
 
+	//replace top domain like com/gov
 	for (var i = 0; i < topDomain.length; ++i){
 		if (domain.lastIndexOf(topDomain[i]) == domain.length - topDomain[i].length){
 			domain = domain.replace(topDomain[i],"");
@@ -120,24 +122,161 @@ function DayTimeStatProcessor(){
 					return  b["lastVisitTime"] - a["lastVisitTime"];
 				});
 				
-	var blob = "";
-
-	var startTime = (new Date).getTime();
-	 for (var i = 0; i < HistroyList.length; ++i) {
+	var startTime = (new Date).getTime() - microsecondsPerWeek * 4;
+	
+	var lastitem = null;
+	
+	var statResult = [];
+	for (var i = 0; i < HistroyList.length; ++i) {
+		if (HistroyList[i].lastVisitTime < startTime){
+			continue;
+		}
+	
+		var d = new Date()
+		d.setTime(HistroyList[i].lastVisitTime);
 		
+		var day = (d.getMonth() + 1) + "-" +  d.getDate();
+		
+		
+		var j = 0;
+		for (; j < statResult.length; ++j){
+			if (statResult[j].day == day){
+				break;
+			}
+		}
+		
+		if (j >= statResult.length){
+			j = statResult.length;
+			var statItem = {day:day, totaltime:	parseInt(0),count:0};
+			statResult.push(statItem);
+		}
+		
+		if (lastitem != null){
+			var d1 = new Date()
+			d1.setTime(lastitem.lastVisitTime);
+		
+			var day1 = (d1.getMonth() + 1) + "-" +  d1.getDate();
+			if (day1 == day){
+				statResult[j].count += 1;
+				var timeDiff =  parseInt(lastitem.lastVisitTime - HistroyList[i].lastVisitTime);
+				if (timeDiff < 1000 * 60 * 10){
+					//alert(timeDiff);
+					//within 10 minutes
+					statResult[j].totaltime += parseInt(timeDiff);
+				}
+			}
+		}
 	 
-		blob += HistroyList[i].host + "," + HistroyList[i].lastVisitTime  + "," + HistroyList[i].visitCount + "," + HistroyList[i].typedCount + "</br>";
+		//blob += HistroyList[i].host + "," + (d.getMonth() + 1) + "-" +  d.getDate() +"," + HistroyList[i].visitCount + "," + HistroyList[i].typedCount + "</br>";
+		
+		lastitem = HistroyList[i];
+		
+	}
+	
+	var blob = "";
+	for (var j = 0; j < statResult.length; ++j){
+		statResult[j].totaltime = parseInt(statResult[j].totaltime)/1000;
+		statResult[j].totaltime = parseInt(statResult[j].totaltime/60);
+		blob += statResult[j].day + "," + statResult[j].totaltime + "," + statResult[j].count +"</br>";
 	}
 		
 	$("#historylist").append(blob);
 }
 
 function StatByMonthTime(){
-	
+	var startTime = (new Date).getTime() - microsecondsPerWeek * 4;
+  var endTime = (new Date).getTime();
+  
+  QueryHistoryItem(startTime,endTime,MonthTimeStatProcessor);
 }
 
 function MonthTimeStatProcessor(){
+	HistroyList.sort(function(a, b) {
+					return  b["lastVisitTime"] - a["lastVisitTime"];
+				});
+				
+	var startTime = (new Date).getTime() - microsecondsPerWeek * 4;
 	
+	var lastitem = null;
+	
+	var statResult = [];
+	for (var i = 0; i < HistroyList.length; ++i) {
+		if (HistroyList[i].lastVisitTime < startTime){
+			continue;
+		}
+	
+		var d = new Date()
+		d.setTime(HistroyList[i].lastVisitTime);
+		
+		var day = (d.getMonth() + 1) + "-" +  d.getDate();
+		
+		
+		var j = 0;
+		for (; j < statResult.length; ++j){
+			if (statResult[j].day == day){
+				break;
+			}
+		}
+		
+		if (j >= statResult.length){
+			j = statResult.length;
+			var statItem = {month:d.getMonth() + 1,day:day, totaltime:	parseInt(0),count:0};
+			statResult.push(statItem);
+		}
+		
+		if (lastitem != null){
+			var d1 = new Date()
+			d1.setTime(lastitem.lastVisitTime);
+		
+			var day1 = (d1.getMonth() + 1) + "-" +  d1.getDate();
+			if (day1 == day){
+				statResult[j].count += 1;
+				var timeDiff =  parseInt(lastitem.lastVisitTime - HistroyList[i].lastVisitTime);
+				if (timeDiff < 1000 * 60 * 10){
+					//alert(timeDiff);
+					//within 10 minutes
+					statResult[j].totaltime += parseInt(timeDiff);
+				}
+			}
+		}
+	 
+		//blob += HistroyList[i].host + "," + (d.getMonth() + 1) + "-" +  d.getDate() +"," + HistroyList[i].visitCount + "," + HistroyList[i].typedCount + "</br>";
+		
+		lastitem = HistroyList[i];
+		
+	}
+	
+	var statResult1 = [];
+	for (var j = 0; j < statResult.length; ++j){
+		statResult[j].totaltime = parseInt(statResult[j].totaltime)/1000;
+		statResult[j].totaltime = parseInt(statResult[j].totaltime/60);
+		
+		var a = 0;
+		for (; a < statResult1.length; ++a){
+			if (statResult1[a].month == statResult[j].month){
+				break;
+			}
+		}
+		
+		if (a >= statResult1.length){
+			a = statResult1.length;
+			var statItem = {month:statResult[j].month, totaltime:parseInt(0),count:0};
+			statResult1.push(statItem);
+		}		
+		
+		statResult1[a].totaltime += statResult[j].totaltime;
+		statResult1[a].count += statResult[j].count;
+		
+	}
+	
+	statResult = [];
+		
+	var blob = "";
+	for (var j = 0; j < statResult1.length; ++j){
+		blob += statResult1[j].month + "," + statResult1[j].totaltime + "," + statResult1[j].count +"</br>";
+	}
+		
+	$("#historylist").append(blob);
 }
 
 function StatByTop10Count(){
@@ -165,5 +304,6 @@ function VisitTypeStatProcessor(){
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-  StatByDayTime();
+  //StatByDayTime();
+  StatByMonthTime();
 });
