@@ -91,6 +91,7 @@ function QueryHistoryItem( startTime,endTime, itemProcessor){
 				}
 				
 				var hitem = {
+					url:item.url,
 					domain:domain  ,
 					host:TrimURL(domain),
 					lastVisitTime: item.lastVisitTime,
@@ -184,7 +185,7 @@ function DayTimeStatProcessor(){
 }
 
 function StatByMonthTime(){
-	var startTime = (new Date).getTime() - microsecondsPerWeek * 4;
+  var startTime = (new Date).getTime() - microsecondsPerWeek * 4;
   var endTime = (new Date).getTime();
   
   QueryHistoryItem(startTime,endTime,MonthTimeStatProcessor);
@@ -280,30 +281,188 @@ function MonthTimeStatProcessor(){
 }
 
 function StatByTop10Count(){
-	
+  var startTime = (new Date).getTime() - microsecondsPerWeek * 4;
+  var endTime = (new Date).getTime();
+  
+  QueryHistoryItem(startTime,endTime,Top10CountStatProcessor);
 }
 
 function Top10CountStatProcessor(){
+			
+	var lastitem = null;
 	
+	var statResult = [];
+	for (var i = 0; i < HistroyList.length; ++i) {
+		var j = 0;
+		for (; j < statResult.length; ++j){
+			if (statResult[j].host == HistroyList[i].host){
+				break;
+			}
+		}
+		
+		if (j >= statResult.length){
+			j = statResult.length;
+			var statItem = {host:HistroyList[i].host, totalcount:0,count:1};
+			statResult.push(statItem);
+		}
+		
+		statResult[j].count += 1;
+		statResult[j].totalcount += HistroyList[i].visitCount;
+	}
+	
+	statResult.sort(function(a, b) {
+		return  b["totalcount"] - a["totalcount"];
+	});
+		
+	var blob = "";
+	for (var j = 0; j < statResult.length; ++j){
+		blob += statResult[j].host + "," + statResult[j].totalcount + "," + statResult[j].count +"</br>";
+	}
+		
+	$("#historylist").append(blob);
 }
 
 function StatByTop10Time(){
-	
+  var startTime = (new Date).getTime() - microsecondsPerWeek * 4;
+  var endTime = (new Date).getTime();
+  
+  QueryHistoryItem(startTime,endTime,Top10TimeStatProcessor);
 }
 
 function Top10TimeStatProcessor(){
+	HistroyList.sort(function(a, b) {
+					return  b["lastVisitTime"] - a["lastVisitTime"];
+				});
 	
+	var lastitem = null;	
+	var statResult = [];
+	for (var i = 0; i < HistroyList.length; ++i) {
+		var j = 0;
+		for (; j < statResult.length; ++j){
+			if (statResult[j].host == HistroyList[i].host){
+				break;
+			}
+		}
+		
+		if (j >= statResult.length){
+			j = statResult.length;
+			var statItem = {host:HistroyList[i].host, totaltime:parseInt(0),count:0};
+			statResult.push(statItem);
+		}
+		
+		statResult[j].count += 1;
+		if (lastitem != null){
+			if (lastitem.host == HistroyList[i].host){
+				var timeDiff =  parseInt(lastitem.lastVisitTime - HistroyList[i].lastVisitTime);
+				if (timeDiff < 1000 * 60 * 10){
+					//alert(timeDiff);
+					//within 10 minutes
+					statResult[j].totaltime += parseInt(timeDiff);
+				}
+			}
+		}
+	 
+		lastitem = HistroyList[i];
+		
+	}
+	
+	statResult.sort(function(a, b) {
+		return  b["totaltime"] - a["totaltime"];
+	});
+	
+	var blob = "";
+	for (var j = 0; j < statResult.length; ++j){
+		statResult[j].totaltime = parseInt(statResult[j].totaltime)/1000;
+		statResult[j].totaltime = parseInt(statResult[j].totaltime/60);
+		blob += statResult[j].host + "," + statResult[j].totaltime + "," + statResult[j].count +"</br>";
+	}
+		
+	$("#historylist").append(blob);
 }
 
 function StatByVisitType(){
-	
+	var startTime = (new Date).getTime() - microsecondsPerWeek * 4;
+  var endTime = (new Date).getTime();
+  
+  QueryHistoryItem(startTime,endTime,VisitTypeStatProcessor);
 }
 
 function VisitTypeStatProcessor(){
+	var statResult = [];
+	var numRequestsOutstanding = 0;
+	//"link"	,"typed","auto_bookmark","auto_subframe","manual_subframe","generated","start_page","form_submit","reload","keyword","keyword_generated"	
+	for (var i = 0; i < HistroyList.length; ++i) {
+        var url = HistroyList[i].url;
+        var processVisitsWithUrl = function(url) {
+          // We need the url of the visited item to process the visit.
+          // Use a closure to bind the  url into the callback's args.
+          return function(visitItems) {
+			for (var ii = 0; ii < visitItems.length; ++ii) {
+				var j = 0;
+				for (; j < statResult.length; ++j){
+					if (statResult[j].transition == visitItems[ii].transition){
+						break;
+					}
+				}
+		
+				if (j >= statResult.length){
+					j = statResult.length;
+					var statItem = {transition:visitItems[ii].transition, count:0};
+					statResult.push(statItem);
+				}
+				
+				statResult[j].count += 1;
+			}
+				
+			
+			if (!--numRequestsOutstanding) {
+				var blob = "";
+				var ticks = [];
+				var s1 = [];
+				
+				for (var j = 0; j < statResult.length; ++j){
+					
+					blob += statResult[j].transition  + ":" + statResult[j].count +"</br>";
+					ticks.push(statResult[j].transition);
+					s1.push(statResult[j].count);
+				}
+				
+				var plot1 = $.jqplot('daytimechart', [s1], {
+								seriesDefaults:{
+								renderer:$.jqplot.BarRenderer,
+								rendererOptions: {fillToZero: true}
+							},
+        
+							legend: {
+								show: true,
+								placement: 'outsideGrid'
+							},
+							axes: {
+							// Use a category axis on the x axis and use our custom ticks.
+								xaxis: {
+								renderer: $.jqplot.CategoryAxisRenderer,
+								ticks: ticks,
+								
+								}
+            
+							}
+						});
+						
+				$("#historylist").append(blob);
+			}
+          };
+        };
+        chrome.history.getVisits({url: url}, processVisitsWithUrl(url));
+        numRequestsOutstanding++;
+      }
+	
 	
 }
 
 document.addEventListener('DOMContentLoaded', function () {
   //StatByDayTime();
-  StatByMonthTime();
+  //StatByMonthTime();
+  //StatByTop10Count();
+  //StatByTop10Time();
+  StatByVisitType();
 });
