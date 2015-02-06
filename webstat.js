@@ -174,14 +174,31 @@ function DayTimeStatProcessor(){
 		
 	}
 	
-	var blob = "";
+	var s1=[];	
+	
 	for (var j = 0; j < statResult.length; ++j){
 		statResult[j].totaltime = parseInt(statResult[j].totaltime)/1000;
 		statResult[j].totaltime = parseInt(statResult[j].totaltime/60);
-		blob += statResult[j].day + "," + statResult[j].totaltime + "," + statResult[j].count +"</br>";
+		//blob += statResult[j].day + "," + statResult[j].totaltime + "," + statResult[j].count +"</br>";
+		var item=[statResult[j].day,statResult[j].totaltime];
+		s1.push(item);
 	}
 		
-	$("#historylist").append(blob);
+	var plot1 = $.jqplot('DayTimeStat', [s1],{
+        					 title:"DayTimeStat",
+							 animate : true,
+							series:[{renderer:$.jqplot.BarRenderer}],
+							seriesDefaults:{pointLabels: {show: true},},
+							axesDefaults: {
+								tickRenderer: $.jqplot.CanvasAxisTickRenderer ,
+								tickOptions: {	angle: -30,  fontSize: '10pt'  }
+							},
+							axes: {
+								xaxis: {
+									renderer: $.jqplot.CategoryAxisRenderer
+								}
+							}
+						});
 }
 
 function StatByMonthTime(){
@@ -271,13 +288,28 @@ function MonthTimeStatProcessor(){
 	}
 	
 	statResult = [];
-		
-	var blob = "";
+	var s1=[];	
 	for (var j = 0; j < statResult1.length; ++j){
-		blob += statResult1[j].month + "," + statResult1[j].totaltime + "," + statResult1[j].count +"</br>";
-	}
 		
-	$("#historylist").append(blob);
+		var item=[statResult1[j].month,statResult1[j].totaltime];
+		s1.push(item);
+	}
+	
+	var plot1 = $.jqplot('MonthTimeStat', [s1],{
+        					 title:"MonthTimeStat",
+							 animate : true,
+							series:[{renderer:$.jqplot.BarRenderer}],
+							seriesDefaults:{pointLabels: {show: true},},
+							axesDefaults: {
+								tickRenderer: $.jqplot.CanvasAxisTickRenderer ,
+								tickOptions: {	angle: -30,  fontSize: '10pt'  }
+							},
+							axes: {
+								xaxis: {
+									renderer: $.jqplot.CategoryAxisRenderer
+								}
+							}
+						});
 }
 
 function StatByTop10Count(){
@@ -314,12 +346,34 @@ function Top10CountStatProcessor(){
 		return  b["totalcount"] - a["totalcount"];
 	});
 		
-	var blob = "";
-	for (var j = 0; j < statResult.length; ++j){
-		blob += statResult[j].host + "," + statResult[j].totalcount + "," + statResult[j].count +"</br>";
+	var s1 = [];
+	var count = 10;
+	if (statResult.length < 10){
+		count = statResult.length;
 	}
+	
+	for (var j = 0; j < count; ++j){
 		
-	$("#historylist").append(blob);
+		var item=[statResult[j].host,statResult[j].totalcount];
+		s1.push(item);
+	}
+	
+	var plot1 = $.jqplot('Top10CountStat', [s1],{
+        					 title:"Top10CountStat",
+							 animate : true,
+							series:[{renderer:$.jqplot.BarRenderer}],
+							seriesDefaults:{pointLabels: {show: true},},
+							axesDefaults: {
+								tickRenderer: $.jqplot.CanvasAxisTickRenderer ,
+								tickOptions: {	angle: -30,  fontSize: '10pt'  }
+							},
+							axes: {
+								xaxis: {
+									renderer: $.jqplot.CategoryAxisRenderer
+								}
+							}
+						});
+	
 }
 
 function StatByTop10Time(){
@@ -370,14 +424,38 @@ function Top10TimeStatProcessor(){
 		return  b["totaltime"] - a["totaltime"];
 	});
 	
-	var blob = "";
-	for (var j = 0; j < statResult.length; ++j){
+	//var blob = "";
+	var s1 = [];
+	var count = 10;
+	if (statResult.length < 10){
+		count = statResult.length;
+	}
+	
+	for (var j = 0; j < count; ++j){
 		statResult[j].totaltime = parseInt(statResult[j].totaltime)/1000;
 		statResult[j].totaltime = parseInt(statResult[j].totaltime/60);
-		blob += statResult[j].host + "," + statResult[j].totaltime + "," + statResult[j].count +"</br>";
+		//blob += statResult[j].host + "," + statResult[j].totaltime + "," + statResult[j].count +"</br>";
+		var item=[statResult[j].host,statResult[j].totaltime];
+		s1.push(item);
 	}
 		
-	$("#historylist").append(blob);
+	//$("#historylist").append(blob);
+	
+	var plot1 = $.jqplot('Top10Time', [s1],{
+        					 title:"Top10Time",
+							 animate : true,
+							series:[{renderer:$.jqplot.BarRenderer}],
+							seriesDefaults:{pointLabels: {show: true},},
+							axesDefaults: {
+								tickRenderer: $.jqplot.CanvasAxisTickRenderer ,
+								tickOptions: {	angle: -30,  fontSize: '10pt'  }
+							},
+							axes: {
+								xaxis: {
+									renderer: $.jqplot.CategoryAxisRenderer
+								}
+							}
+						});
 }
 
 function StatByVisitType(){
@@ -416,39 +494,35 @@ function VisitTypeStatProcessor(){
 				
 			
 			if (!--numRequestsOutstanding) {
-				var blob = "";
+				//var blob = "";
 				var ticks = [];
 				var s1 = [];
 				
 				for (var j = 0; j < statResult.length; ++j){
 					
-					blob += statResult[j].transition  + ":" + statResult[j].count +"</br>";
-					ticks.push(statResult[j].transition);
-					s1.push(statResult[j].count);
+					//blob += statResult[j].transition  + ":" + statResult[j].count +"</br>";
+					var item=[statResult[j].transition,statResult[j].count];
+					
+					s1.push(item);
 				}
-				
-				var plot1 = $.jqplot('daytimechart', [s1], {
-								seriesDefaults:{
-								renderer:$.jqplot.BarRenderer,
-								rendererOptions: {fillToZero: true}
-							},
-        
-							legend: {
-								show: true,
-								placement: 'outsideGrid'
+		
+				var plot1 = $.jqplot('TypeStat', [s1],{
+           					 title:"type stat",
+							 animate : true,
+							series:[{renderer:$.jqplot.BarRenderer}],
+							seriesDefaults:{pointLabels: {show: true},},
+							axesDefaults: {
+								tickRenderer: $.jqplot.CanvasAxisTickRenderer ,
+								tickOptions: {	angle: -30,  fontSize: '10pt'  }
 							},
 							axes: {
-							// Use a category axis on the x axis and use our custom ticks.
 								xaxis: {
-								renderer: $.jqplot.CategoryAxisRenderer,
-								ticks: ticks,
-								
+									renderer: $.jqplot.CategoryAxisRenderer
 								}
-            
 							}
 						});
 						
-				$("#historylist").append(blob);
+				//$("#historylist").append(blob);
 			}
           };
         };
@@ -460,9 +534,20 @@ function VisitTypeStatProcessor(){
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-  //StatByDayTime();
-  //StatByMonthTime();
-  //StatByTop10Count();
-  //StatByTop10Time();
+  StatByDayTime();
+  StatByMonthTime();
+  StatByTop10Count();
+  StatByTop10Time();
   StatByVisitType();
 });
+
+
+
+
+
+
+
+
+
+
+
