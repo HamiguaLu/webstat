@@ -1,10 +1,10 @@
 <!DOCTYPE HTML>
 <html>
   <head>
-    <title>Recently Typed URLs</title>
+    <title>Web Stat</title>
     <style>
       body {min-width: 250px;}
-	  #TypeStat {width:500px; height:300px;}
+	  .StatItem {width:500px; height:300px;float:left;margin:12px;}
     </style>
 	<script src='jquery.min.js'></script>
 	<script type="text/javascript" src="jquery.jqplot.min.js"></script>
@@ -20,12 +20,12 @@
   </head>
 
   <body>
-    <h2>Recently Typed URLs:</h2>
-    <div id="historylist"></div>
-	<div id="DayTimeStat"></div>
-	<div id="MonthTimeStat"></div>
-	<div id="Top10CountStat"></div>
-	<div id="Top10Time"></div>
-	<div id="TypeStat"></div>
+    <h2>Web Visit Stat</h2>
+	<div class="StatItem" id="Top10CountStat"></div>
+	<div class="StatItem" id="Top10Time"></div>
+	<div class="StatItem" id="DayTimeStat"></div>
+	<div class="StatItem" id="MonthTimeStat"></div>
+	
+	<div class="StatItem" id="TypeStat"></div>
   </body>
 </html>

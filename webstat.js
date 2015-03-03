@@ -185,10 +185,10 @@ function DayTimeStatProcessor(){
 	}
 		
 	var plot1 = $.jqplot('DayTimeStat', [s1],{
-        					 title:"DayTimeStat",
+        					 title:"Time spend on each day(in minutes)",
 							 animate : true,
 							series:[{renderer:$.jqplot.BarRenderer}],
-							seriesDefaults:{pointLabels: {show: true},},
+							seriesDefaults:{pointLabels: {show: true}, rendererOptions: {varyBarColor: true }},
 							axesDefaults: {
 								tickRenderer: $.jqplot.CanvasAxisTickRenderer ,
 								tickOptions: {	angle: -30,  fontSize: '10pt'  }
@@ -296,10 +296,10 @@ function MonthTimeStatProcessor(){
 	}
 	
 	var plot1 = $.jqplot('MonthTimeStat', [s1],{
-        					 title:"MonthTimeStat",
+        					 title:"Time spend on each month(in minutes)",
 							 animate : true,
 							series:[{renderer:$.jqplot.BarRenderer}],
-							seriesDefaults:{pointLabels: {show: true},},
+							seriesDefaults:{pointLabels: {show: true}, rendererOptions: {varyBarColor: true }},
 							axesDefaults: {
 								tickRenderer: $.jqplot.CanvasAxisTickRenderer ,
 								tickOptions: {	angle: -30,  fontSize: '10pt'  }
@@ -359,10 +359,10 @@ function Top10CountStatProcessor(){
 	}
 	
 	var plot1 = $.jqplot('Top10CountStat', [s1],{
-        					 title:"Top10CountStat",
+        					 title:"Most visited 10 sites",
 							 animate : true,
 							series:[{renderer:$.jqplot.BarRenderer}],
-							seriesDefaults:{pointLabels: {show: true},},
+							seriesDefaults:{pointLabels: {show: true}, rendererOptions: {varyBarColor: true }},
 							axesDefaults: {
 								tickRenderer: $.jqplot.CanvasAxisTickRenderer ,
 								tickOptions: {	angle: -30,  fontSize: '10pt'  }
@@ -442,10 +442,10 @@ function Top10TimeStatProcessor(){
 	//$("#historylist").append(blob);
 	
 	var plot1 = $.jqplot('Top10Time', [s1],{
-        					 title:"Top10Time",
+        					 title:"Most visited 10 sites (in minutes)",
 							 animate : true,
 							series:[{renderer:$.jqplot.BarRenderer}],
-							seriesDefaults:{pointLabels: {show: true},},
+							seriesDefaults:{pointLabels: {show: true}, rendererOptions: {varyBarColor: true }},
 							axesDefaults: {
 								tickRenderer: $.jqplot.CanvasAxisTickRenderer ,
 								tickOptions: {	angle: -30,  fontSize: '10pt'  }
@@ -507,10 +507,10 @@ function VisitTypeStatProcessor(){
 				}
 		
 				var plot1 = $.jqplot('TypeStat', [s1],{
-           					 title:"type stat",
+           					 title:"Visit type stat",
 							 animate : true,
 							series:[{renderer:$.jqplot.BarRenderer}],
-							seriesDefaults:{pointLabels: {show: true},},
+							seriesDefaults:{pointLabels: {show: true}, rendererOptions: {varyBarColor: true }},
 							axesDefaults: {
 								tickRenderer: $.jqplot.CanvasAxisTickRenderer ,
 								tickOptions: {	angle: -30,  fontSize: '10pt'  }
